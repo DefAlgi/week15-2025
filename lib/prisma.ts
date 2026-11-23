@@ -1,24 +1,15 @@
+import { PrismaClient } from '@prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require('@prisma/client') as {
-  PrismaClient: new (args?: { adapter?: unknown }) => {
-    note: {
-      findMany: (args?: unknown) => Promise<Array<{ id: number; title: string; content: string; createdAt: Date }>>;
-      create: (args: unknown) => Promise<{ id: number; title: string; content: string; createdAt: Date }>;
-      update: (args: unknown) => Promise<{ id: number; title: string; content: string; createdAt: Date }>;
-      delete: (args: unknown) => Promise<unknown>;
-    };
-  };
-};
-
-const globalForPrisma = globalThis as unknown as {
-  prisma?: InstanceType<typeof PrismaClient>;
+const globalForPrisma = globalThis as typeof globalThis & {
+  prisma?: PrismaClient;
 };
 
 function createPrismaClient() {
-  const url = process.env.DATABASE_URL ?? 'file:./dev.db';
-  const adapter = new PrismaBetterSqlite3({ url });
+  const adapter = new PrismaBetterSqlite3({
+    url: process.env.DATABASE_URL ?? 'file:./dev.db',
+  });
+
   return new PrismaClient({ adapter });
 }
 
